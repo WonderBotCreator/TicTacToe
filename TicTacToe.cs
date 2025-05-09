@@ -99,7 +99,6 @@ public class TicTacToe
 
     void GetPlayerInput()
     {
-        Console.WriteLine(round);
         if (round % 2 != 0)
         {
             
