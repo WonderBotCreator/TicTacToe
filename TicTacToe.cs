@@ -1,183 +1,332 @@
 public class TicTacToe
 {
-    int[] num = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    int[,] box = new int[3, 3];
-    int order = 0;
-    string[,] box2 = new string[3, 3];
+    int size = 0;
 
+    int[,] playerBlock = new int[3, 3];
 
-    int round = 1;
-    int x = 0;
-    int o = 0;
-    bool assigned = false;
-    string winner = "";
+    int numTurn;
 
-
-    public TicTacToe(){
-        
+    enum PlayerTurn
+    {
+        XTurn, OTurn
     }
 
-
-    bool IsGameFinish()
+    PlayerTurn currentTurn;
+    public void Run()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            if (box2[0, i] == "X" && box2[1, i] == "X" && box2[2, i] == "X")
-            {
-                winner = "X";
-                return true;
-            }
-            if (box2[0, i] == "O" && box2[1, i] == "O" && box2[2, i] == "O")
-            {
-                winner = "O";
-                return true;
-            }
-            if (box2[i, 0] == "X" && box2[i, 1] == "X" && box2[i, 2] == "X")
-            {
-                winner = "X";
-                return true;
-            }
-            if (box2[i, 0] == "O" && box2[i, 1] == "O" && box2[i, 2] == "O")
-            {
-                winner = "O";
-                return true;
-            }
-        }
-
-        if (box2[0, 0] == "X" && box2[1, 1] == "X" && box2[2, 2] == "X")
-        {
-            winner = "X";
-            return true;
-        }
-
-        if (box2[0, 0] == "O" && box2[1, 1] == "O" && box2[2, 2] == "O")
-        {
-            winner = "O";
-            return true;
-        }
-        if (box2[2, 0] == "X" && box2[1, 1] == "X" && box2[0, 2] == "X")
-        {
-            winner = "X";
-            return true;
-        }
-
-        if (box2[2, 0] == "O" && box2[1, 1] == "O" && box2[0, 2] == "O")
-        {
-            winner = "O";
-            return true;
-        }
+        GetInputSize();
+        GenerateBlock();
 
 
-        if (round > 9)
+        while (!IsFinish())
         {
-            return true;
+            GetPlayerInput();
+            ShowBlock();
         }
-        return false;
     }
 
-
-    void AssignValToTable()
+    void GetInputSize()
     {
-        for (int i = 0; i < 3; i++)
+        Console.WriteLine("Please enters number of TicTacToe block size between 3 and 5");
+        Console.WriteLine("If input size is 3, TicTacToe block size is 3x3");
+        Console.WriteLine("If input size is 4, TicTacToe block size is 4x4");
+        Console.WriteLine("If input size is 5, TicTacToe block size is 5x5");
+        Console.Write("Input size: ");
+        size = int.Parse(Console.ReadLine());
+
+
+        if (size >= 3 && size <= 5)
         {
-            for (int j = 0; j < 3; j++)
+            playerBlock = new int[size, size];
+
+            numTurn = 1;
+
+            for (int i = 0; i < size; i++)
             {
-                if (x == box[j, i] && box2[j, i] != "X" && box2[j, i] != "O" && round % 2 != 0)
+                for (int j = 0; j < size; j++)
                 {
-                    box2[j, i] = "X";
-                    assigned = true;
-                }
-                else if (o == box[j, i] && box2[j, i] != "X" && box2[j, i] != "O" && round % 2 == 0)
-                {
-                    box2[j, i] = "O";
-                    assigned = true;
+                    playerBlock[i, j] = -1;
                 }
             }
+
+            currentTurn = PlayerTurn.XTurn;
         }
+        else
+        {
+            GetInputSize();
+        }
+
+
+
     }
 
+    void GenerateBlock()
+    {
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                Console.Write(" |");
+            }
+            Console.WriteLine();
+
+            for (int j = 0; j < size; j++)
+            {
+                Console.Write("__");
+            }
+            Console.WriteLine();
+        }
+    }
 
     void GetPlayerInput()
     {
-        if (round % 2 != 0)
+        int pos = 1;
+
+        if (currentTurn == PlayerTurn.XTurn)
         {
-            
             Console.Write("Player X turn: ");
-            x = int.Parse(Console.ReadLine());
+            pos = int.Parse(Console.ReadLine());
         }
-        else
+        else if (currentTurn == PlayerTurn.OTurn)
         {
             Console.Write("Player O turn: ");
-            o = int.Parse(Console.ReadLine());
+            pos = int.Parse(Console.ReadLine());
+        }
+
+
+
+        int num = 1;
+
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+
+                if (pos == num && playerBlock[i, j] == -1)
+                {
+                    if (currentTurn == PlayerTurn.XTurn)
+                    {
+                        playerBlock[i, j] = 1;
+                        currentTurn = PlayerTurn.OTurn;
+                        numTurn++;
+                        return;
+                    }
+                    else if (currentTurn == PlayerTurn.OTurn)
+                    {
+                        playerBlock[i, j] = 0;
+                        currentTurn = PlayerTurn.XTurn;
+                        numTurn++;
+                        return;
+                    }
+                }
+                num++;
+            }
         }
     }
 
 
-    void ShowTable()
+    void ShowBlock()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < size; i++)
         {
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < size; j++)
             {
-                Console.Write(box2[j, i] + "|");
+                if (playerBlock[i, j] == -1)
+                {
+                    Console.Write(" |");
+                }
+                else if (playerBlock[i, j] == 0)
+                {
+                    Console.Write("O|");
+                }
+                else if (playerBlock[i, j] == 1)
+                {
+                    Console.Write("X|");
+                }
+
             }
-            Console.WriteLine("");
-            Console.WriteLine("_______");
+            Console.WriteLine();
+
+
+            for (int j = 0; j < size; j++)
+            {
+                Console.Write("__");
+            }
+            Console.WriteLine();
         }
     }
 
-    public void Run()
+    bool IsFinish()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                box[j, i] = num[order];
-                order++;
-            }
-        }
 
-
-
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                box2[j, i] = " ";
-            }
-        }
-
-        
-
-
-
-
-
-
-        while (!IsGameFinish())
-        {
-            ShowTable();
-            GetPlayerInput();
-            AssignValToTable();
-            if (assigned)
-            {
-                round++;
-                assigned = false;
-            }
-        }
-
-        ShowTable();
-        if (winner == "")
+        if (numTurn > size * size)
         {
             Console.WriteLine("Draw");
+            return true;
         }
-        else
+
+        for (int i = 0; i < size; i++)
         {
-            Console.WriteLine($"The winner is {winner}");
+            int score = 1;
+            int prevBlock = -1;
+
+            //Horizontal
+            for (int j = 0; j < size; j++)
+            {
+
+                if (prevBlock == -1)
+                {
+                    if (playerBlock[i, j] == 0)
+                    {
+                        prevBlock = 0;
+                    }
+                    else if (playerBlock[i, j] == 1)
+                    {
+                        prevBlock = 1;
+                    }
+                }
+                if (j > 0 && playerBlock[i, j] == playerBlock[i, j - 1] && playerBlock[i, j] != -1 && playerBlock[i, j] == prevBlock)
+                {
+                    score++;
+                    //Console.WriteLine(score);
+                }
+
+                if (score == size)
+                {
+                    //Console.WriteLine(score);
+                    if (playerBlock[i, j] == 0)
+                    {
+                        Console.WriteLine("Player O win");
+                        return true;
+                    }
+                    else if (playerBlock[i, j] == 1)
+                    {
+                        Console.WriteLine("Player X win");
+                        return true;
+                    }
+
+                }
+            }
+
+            score = 1;
+            prevBlock = -1;
+            //Vertical
+            for (int j = 0; j < size; j++)
+            {
+                if (prevBlock == -1)
+                {
+                    if (playerBlock[i, j] == 0)
+                    {
+                        prevBlock = 0;
+                    }
+                    else if (playerBlock[i, j] == 1)
+                    {
+                        prevBlock = 1;
+                    }
+                }
+                if (j > 0 && playerBlock[j, i] == playerBlock[j - 1, i] && playerBlock[j, i] != -1)
+                {
+                    score++;
+                    //Console.WriteLine(score);
+                }
+
+                if (score == size)
+                {
+                    //Console.WriteLine(score);
+                    if (playerBlock[j, i] == 0)
+                    {
+                        Console.WriteLine("Player O win");
+                        return true;
+                    }
+                    else if (playerBlock[j, i] == 1)
+                    {
+                        Console.WriteLine("Player X win");
+                        return true;
+                    }
+
+                }
+            }
         }
+
+        int scoreCross = 1;
+        int prevBlock2 = -1;
+
+        for (int i = 0; i < size; i++)
+        {
+
+            if (prevBlock2 == -1)
+            {
+                if (playerBlock[i, i] == 0)
+                {
+                    prevBlock2 = 0;
+                }
+                else if (playerBlock[i, i] == 1)
+                {
+                    prevBlock2 = 1;
+                }
+            }
+
+            if (i > 0 && playerBlock[i, i] == playerBlock[i - 1, i - 1] && playerBlock[i, i] != -1 && playerBlock[i, i] == prevBlock2)
+            {
+                scoreCross++;
+            }
+
+            if (scoreCross == size)
+            {
+                if (playerBlock[i, i] == 0)
+                {
+                    Console.WriteLine("Player O win");
+                    return true;
+                }
+                else if (playerBlock[i, i] == 1)
+                {
+                    Console.WriteLine("Player X win");
+                    return true;
+                }
+            }
+        }
+
+        scoreCross = 1;
+        prevBlock2 = -1;
+
+        int col2 = size - 1;
+
+        for (int i = 0; i < size; i++)
+        {
+
+            if (prevBlock2 == -1)
+            {
+                if (playerBlock[i, col2] == 0)
+                {
+                    prevBlock2 = 0;
+                }
+                else if (playerBlock[i, col2] == 1)
+                {
+                    prevBlock2 = 1;
+                }
+            }
+
+            if (col2 > -1 && i > 0 && playerBlock[i, col2] == playerBlock[i - 1, col2 + 1] && playerBlock[i, col2] != -1 && playerBlock[i, col2] == prevBlock2)
+            {
+                scoreCross++;
+            }
+
+            if (scoreCross == size)
+            {
+                if (playerBlock[i, col2] == 0)
+                {
+                    Console.WriteLine("Player O win");
+                    return true;
+                }
+                else if (playerBlock[i, col2] == 1)
+                {
+                    Console.WriteLine("Player X win");
+                    return true;
+                }
+            }
+            col2--;
+        }
+
+        return false;
     }
 }
-
-
-
